@@ -91,11 +91,11 @@ resource "aws_iam_role" "ecs_task_execution" {
   name = "django-dev-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
         Principal = {
           Service = "ecs-tasks.amazonaws.com"
         }
@@ -145,7 +145,7 @@ resource "aws_ecs_task_definition" "django_app" {
 
       logConfiguration = {
         logDriver = "awslogs"
-        options = {
+        options   = {
           awslogs-group         = aws_cloudwatch_log_group.django_app.name
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "django"
@@ -189,7 +189,7 @@ resource "aws_ecs_service" "django_app" {
   desired_count   = 1
 
   network_configuration {
-    subnets          = [
+    subnets = [
       aws_subnet.public_a.id,
       aws_subnet.public_b.id
     ]
@@ -206,10 +206,10 @@ resource "aws_iam_role" "codebuild" {
   name = "django-dev-codebuild-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = {
           Service = "codebuild.amazonaws.com"
         }
@@ -224,7 +224,7 @@ resource "aws_iam_role_policy" "codebuild" {
   role = aws_iam_role.codebuild.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
@@ -301,10 +301,10 @@ resource "aws_iam_role" "codepipeline" {
   name = "django-dev-codepipeline-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = {
           Service = "codepipeline.amazonaws.com"
         }
@@ -319,7 +319,7 @@ resource "aws_iam_role_policy" "codepipeline" {
   role = aws_iam_role.codepipeline.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
@@ -396,6 +396,7 @@ resource "aws_codepipeline" "django_app" {
         ConnectionArn    = var.github_connection_arn
         FullRepositoryId = var.github_repo_id
         BranchName       = var.github_branch
+        DetectChanges    = "true"
       }
     }
   }

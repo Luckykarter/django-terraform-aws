@@ -1,13 +1,11 @@
-
-
 resource "aws_iam_role" "codepipeline" {
   name = "django-dev-codepipeline-role"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = {
           Service = "codepipeline.amazonaws.com"
         }
@@ -22,7 +20,7 @@ resource "aws_iam_role_policy" "codepipeline" {
   role = aws_iam_role.codepipeline.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [
       {
         Effect = "Allow"
@@ -50,7 +48,10 @@ resource "aws_iam_role_policy" "codepipeline" {
           "codebuild:BatchGetBuilds",
           "codebuild:StartBuild"
         ]
-        Resource = aws_codebuild_project.django_app.arn
+        Resource = [
+          aws_codebuild_project.django_app.arn,
+          aws_codebuild_project.django_migrate.arn
+        ]
       },
       {
         Effect = "Allow"
@@ -118,6 +119,23 @@ resource "aws_codepipeline" "django_app" {
 
       configuration = {
         ProjectName = aws_codebuild_project.django_app.name
+      }
+    }
+  }
+
+  stage {
+    name = "Migrate"
+
+    action {
+      name            = "RunMigrations"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      input_artifacts = ["build_output"]
+      version         = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.django_migrate.name
       }
     }
   }

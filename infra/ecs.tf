@@ -79,6 +79,18 @@ resource "aws_ecs_task_definition" "django_app" {
         {
           name  = "DEBUG"
           value = "x"
+        },
+        {
+          name  = "DB_NAME"
+          value = aws_db_instance.django_app.db_name
+        },
+        {
+          name  = "DB_HOST"
+          value = aws_db_instance.django_app.address
+        },
+        {
+          name  = "DB_PORT"
+          value = "5432"
         }
       ]
 
@@ -95,11 +107,11 @@ resource "aws_ecs_task_definition" "django_app" {
 }
 
 resource "aws_ecs_service" "django_app" {
-  name            = "django-app-dev-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.django_app.arn
-  launch_type     = "FARGATE"
-  desired_count   = 1
+  name                   = "django-app-dev-service"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.django_app.arn
+  launch_type            = "FARGATE"
+  desired_count          = 1
   enable_execute_command = true
 
   network_configuration {

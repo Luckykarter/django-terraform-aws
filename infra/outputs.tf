@@ -21,3 +21,7 @@ output "alb_dns_name" {
 output "django_app_secrets_arn" {
   value = aws_secretsmanager_secret.django_app_secrets.arn
 }
+
+output "rds_endpoint" {
+  value = aws_db_instance.django_app.address
+}

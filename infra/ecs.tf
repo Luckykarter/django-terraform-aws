@@ -37,6 +37,7 @@ resource "aws_ecs_task_definition" "django_app" {
   cpu                      = 256
   memory                   = 512
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
 
   container_definitions = jsonencode([
     {
@@ -99,6 +100,7 @@ resource "aws_ecs_service" "django_app" {
   task_definition = aws_ecs_task_definition.django_app.arn
   launch_type     = "FARGATE"
   desired_count   = 1
+  enable_execute_command = true
 
   network_configuration {
     subnets = [
@@ -131,6 +133,44 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = aws_secretsmanager_secret.django_app_secrets.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "ecs_task" {
+  name = "django-dev-ecs-task-role"
+
+  assume_role_policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "ecs_task_exec" {
+  name = "django-dev-ecs-task-exec-policy"
+  role = aws_iam_role.ecs_task.id
+
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
       }
     ]
   })

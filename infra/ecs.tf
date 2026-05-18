@@ -183,6 +183,19 @@ resource "aws_iam_role_policy" "ecs_task_exec" {
           "ssmmessages:OpenDataChannel"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.django_static.arn,
+          "${aws_s3_bucket.django_static.arn}/*"
+        ]
       }
     ]
   })

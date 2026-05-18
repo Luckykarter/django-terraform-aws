@@ -34,13 +34,19 @@ resource "aws_iam_role_policy" "codebuild" {
       {
         Effect = "Allow"
         Action = [
-          "ecs:RunTask",
-          "ecs:DescribeTasks"
+          "ecs:RunTask"
         ]
         Resource = [
           aws_ecs_task_definition.django_app.arn,
           "${aws_ecs_task_definition.django_app.arn_without_revision}:*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:DescribeTasks"
+        ]
+        Resource = "*"
       },
       {
         Effect = "Allow"

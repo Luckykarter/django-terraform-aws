@@ -40,8 +40,21 @@ INSTALLED_APPS = [
     'storages'
 ]
 
-AWS_STORAGE_BUCKET_NAME = "django-dev-static-365a77e6"
-AWS_S3_REGION_NAME = "eu-west-2"
+
+AWS_STORAGE_BUCKET_NAME = os.environ["AWS_STORAGE_BUCKET_NAME"]
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "eu-west-2")
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+    },
+}
+
+STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/static/"
+STATIC_ROOT = "static/"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -115,11 +128,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

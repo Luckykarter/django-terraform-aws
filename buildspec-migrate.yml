@@ -19,7 +19,7 @@ phases:
           --launch-type FARGATE \
           --task-definition $ECS_TASK_DEFINITION \
           --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNETS],securityGroups=[$ECS_SECURITY_GROUPS],assignPublicIp=ENABLED}" \
-          --overrides "{\"containerOverrides\":[{\"name\":\"$ECS_CONTAINER_NAME\",\"command\":[\"python\",\"manage.py\",\"migrate\",\"--noinput\"]}]}" \
+          --overrides "{\"containerOverrides\":[{\"name\":\"$ECS_CONTAINER_NAME\",\"command\":[\"/bin/sh\",\"-c\",\"python manage.py migrate --noinput && python manage.py collectstatic --noinput\"]}]}" \
           --query 'tasks[0].taskArn' \
           --output text)
 

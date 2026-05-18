@@ -61,7 +61,8 @@ resource "aws_iam_role_policy" "codepipeline" {
           "ecs:DescribeTasks",
           "ecs:ListTasks",
           "ecs:RegisterTaskDefinition",
-          "ecs:UpdateService"
+          "ecs:UpdateService",
+          "ecs:TagResource"
         ]
         Resource = "*"
       },
@@ -70,7 +71,10 @@ resource "aws_iam_role_policy" "codepipeline" {
         Action = [
           "iam:PassRole"
         ]
-        Resource = aws_iam_role.ecs_task_execution.arn
+        Resource = [
+          aws_iam_role.ecs_task_execution.arn,
+          aws_iam_role.ecs_task.arn
+        ]
       }
     ]
   })
@@ -131,7 +135,7 @@ resource "aws_codepipeline" "django_app" {
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
-      input_artifacts = ["build_output"]
+      input_artifacts = ["source_output"]
       version         = "1"
 
       configuration = {
